@@ -13,6 +13,7 @@ export const dashboardNav = [
   { label: 'Messages', to: '/dashboard/messages' },
   { label: 'Notifications', to: '/dashboard/notifications' },
   { label: 'Settings', to: '/dashboard/settings' },
+  { label: 'Logout', to: '/dashboard/logout' }
 ];
 
 export const adminNav = [

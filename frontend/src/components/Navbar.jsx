@@ -33,7 +33,7 @@ export default function Navbar() {
 
   return (
     <header className="sticky top-0 z-30 border-b border-slate-200 bg-white/95 backdrop-blur">
-      <div className="container-page flex h-16 items-center gap-4">
+      <div className="flex h-16 items-center gap-4 px-6 lg:px-10">
         <Link to="/" className="shrink-0 text-xl font-extrabold text-primary">VSSUT OLX</Link>
         <div className="hidden flex-1 justify-center lg:flex"><SearchBar compact /></div>
         <nav className="hidden items-center gap-5 xl:flex">{navLinks}</nav>
@@ -53,13 +53,23 @@ export default function Navbar() {
         </div>
         <Button variant="ghost" size="sm" className="md:hidden" onClick={() => setOpen(true)} aria-label="Open menu"><FaBars /></Button>
       </div>
-      <Drawer open={open} onClose={() => setOpen(false)}>
+      {/* <Drawer open={open} onClose={() => setOpen(false)}>
         <div className="grid gap-4">
           <SearchBar compact />
           <nav className="grid gap-3">{navLinks}</nav>
           {user ? <Button to="/dashboard">Profile</Button> : <Button to="/login">Login</Button>}
         </div>
-      </Drawer>
+      </Drawer> */}
+
+      {open && (
+        <Drawer open={open} onClose={() => setOpen(false)}>
+          <div className="grid gap-4">
+            <SearchBar compact />
+            <nav className="grid gap-3">{navLinks}</nav>
+            {user ? <Button to="/dashboard">Profile</Button> : <Button to="/login">Login</Button>}
+          </div>
+        </Drawer>
+      )}
     </header>
   );
 }

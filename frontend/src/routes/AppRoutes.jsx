@@ -35,6 +35,8 @@ const ManageListings = lazy(() => import('../pages/admin/ManageListings'));
 const Reports = lazy(() => import('../pages/admin/Reports'));
 const Analytics = lazy(() => import('../pages/admin/Analytics'));
 
+const Logout = lazy(() => import('../pages/dashboard/Logout'));
+
 export default function AppRoutes() {
   return (
     <Routes>
@@ -64,6 +66,7 @@ export default function AppRoutes() {
           <Route path="messages" element={<Messages />} />
           <Route path="messages/:id" element={<ChatRoom />} />
           <Route path="notifications" element={<Notifications />} />
+          <Route path="logout" element={<Logout />} />
         </Route>
       </Route>
 
