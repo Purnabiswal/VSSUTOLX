@@ -1,28 +1,37 @@
-import axios from 'axios';
+import axios from "axios";
+import { parseApiError } from "../utils/apiErrors";
+
+export const TOKEN_STORAGE_KEY = "vssut_olx_token";
 
 const api = axios.create({
-  baseURL: '/mock-api',
-  timeout: 800,
-  headers: { 'Content-Type': 'application/json' },
+  baseURL: import.meta.env.VITE_API_URL || "http://localhost:5000/api",
+  headers: {
+    "Content-Type": "application/json",
+  },
+  withCredentials: true,
 });
 
 api.interceptors.request.use((config) => {
-  const token = localStorage.getItem('vssut_olx_token');
+  const token = localStorage.getItem(TOKEN_STORAGE_KEY);
   if (token) config.headers.Authorization = `Bearer ${token}`;
+  if (config.data instanceof globalThis.FormData) {
+    delete config.headers['Content-Type'];
+  }
   return config;
 });
 
 api.interceptors.response.use(
   (response) => response,
   (error) => {
-    const message = error.response?.data?.message || error.message || 'Something went wrong';
-    return Promise.reject(new Error(message));
+    const parsed = parseApiError(error);
+    if (error.response?.status === 401) {
+      localStorage.removeItem(TOKEN_STORAGE_KEY);
+    }
+    const normalized = new Error(parsed.message);
+    normalized.status = parsed.status;
+    normalized.details = parsed.details;
+    return Promise.reject(normalized);
   },
 );
-
-export const mockDelay = (payload, delay = 220) =>
-  new Promise((resolve) => {
-    window.setTimeout(() => resolve(payload), delay);
-  });
 
 export default api;

@@ -9,7 +9,14 @@ import { emailValidation } from '../utils/validators';
 export default function ForgotPassword() {
   const { register, handleSubmit, formState: { errors } } = useForm();
   const pushToast = useNotificationStore((state) => state.pushToast);
-  const onSubmit = async ({ email }) => { const res = await authService.forgotPassword(email); pushToast({ message: res.message }); };
+  const onSubmit = async ({ email }) => {
+    try {
+      const res = await authService.forgotPassword(email);
+      pushToast({ message: res.message });
+    } catch (err) {
+      pushToast({ message: err.message });
+    }
+  };
   return (
     <section className="container-page grid min-h-[70vh] place-items-center py-10">
       <SEO title="Forgot Password" />

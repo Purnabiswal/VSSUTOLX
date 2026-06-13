@@ -8,18 +8,27 @@ import { useNotificationStore } from '../../store/notificationStore';
 
 export default function ProfileSettings() {
   const user = useAuthStore((state) => state.user);
+  const hydrateCurrentUser = useAuthStore((state) => state.hydrateCurrentUser);
   const { register, handleSubmit } = useForm({ values: user || {} });
   const pushToast = useNotificationStore((state) => state.pushToast);
-  const onSubmit = async (data) => { await userService.updateProfile(data); pushToast({ message: 'Profile updated' }); };
+  const onSubmit = async (data) => {
+    try {
+      await userService.updateProfile(data);
+      await hydrateCurrentUser();
+      pushToast({ message: 'Profile updated' });
+    } catch (err) {
+      pushToast({ message: err.message });
+    }
+  };
   return (
     <div>
       <SEO title="Profile Settings" />
       <h1 className="mb-6 text-3xl font-extrabold text-secondary">Profile Settings</h1>
       <form onSubmit={handleSubmit(onSubmit)} className="surface grid max-w-2xl gap-4 rounded-md p-5">
         <Input label="Name" {...register('name')} />
-        <Input label="Email" {...register('email')} />
-        <Input label="Department" {...register('department')} />
-        <Input label="Location" {...register('location')} />
+        <Input label="Email" {...register('email')} disabled />
+        <Input label="Branch" {...register('branch')} />
+        <Input label="Year" type="number" min="1" max="5" {...register('year')} />
         <Button type="submit">Save Changes</Button>
       </form>
     </div>

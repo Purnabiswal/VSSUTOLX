@@ -6,6 +6,7 @@ import Avatar from '../../components/Avatar';
 import Button from '../../components/Button';
 import ChatBubble from '../../components/ChatBubble';
 import { useChatStore } from '../../store/chatStore';
+import { useAuthStore } from '../../store/authStore';
 import { useSocket } from '../../hooks/useSocket';
 
 export default function ChatRoom() {
@@ -13,6 +14,7 @@ export default function ChatRoom() {
   const { id } = useParams();
   const [text, setText] = useState('');
   const { activeConversation, openConversation, sendMessage } = useChatStore();
+  const user = useAuthStore((state) => state.user);
   useEffect(() => { openConversation(id); }, [openConversation, id]);
   const submit = async (event) => {
     event.preventDefault();
@@ -26,11 +28,11 @@ export default function ChatRoom() {
       <SEO title="Chat" />
       <div className="surface flex h-[72vh] flex-col rounded-md">
         <div className="flex items-center gap-3 border-b border-slate-200 p-4">
-          <Avatar src={activeConversation.participant.avatar} name={activeConversation.participant.name} />
-          <div><p className="font-bold text-secondary">{activeConversation.participant.name}</p><p className="text-sm text-success">{activeConversation.online ? 'Online' : activeConversation.typing ? 'Typing...' : 'Offline'}</p></div>
+          <Avatar src={activeConversation.participant?.avatar} name={activeConversation.participant?.name} />
+          <div><p className="font-bold text-secondary">{activeConversation.participant?.name || 'VSSUT user'}</p><p className="text-sm text-success">{activeConversation.online ? 'Online' : activeConversation.typing ? 'Typing...' : 'Offline'}</p></div>
         </div>
         <div className="flex-1 space-y-3 overflow-y-auto p-4">
-          {activeConversation.messages.map((message) => <ChatBubble key={message.id} message={message} mine={message.senderId === 'me'} />)}
+          {activeConversation.messages.map((message) => <ChatBubble key={message.id} message={message} mine={message.senderId === user?.id} />)}
           {activeConversation.typing && <p className="text-sm text-slate-400">Typing indicator...</p>}
         </div>
         <form onSubmit={submit} className="flex gap-2 border-t border-slate-200 p-4">

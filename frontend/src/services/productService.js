@@ -1,49 +1,88 @@
-import { mockDelay } from './api';
-import { products } from '../data/mockData';
+import api from './api';
 
-let productDb = [...products];
+const fallbackImage = 'https://images.unsplash.com/photo-1556742502-ec7c0e9f34b1?auto=format&fit=crop&w=900&q=80';
 
-const filterProducts = (items, params = {}) => {
-  let result = [...items];
-  if (params.query) {
-    const query = params.query.toLowerCase();
-    result = result.filter((item) => `${item.title} ${item.description} ${item.location}`.toLowerCase().includes(query));
-  }
-  if (params.category) result = result.filter((item) => item.category === params.category);
-  if (params.minPrice) result = result.filter((item) => item.price >= Number(params.minPrice));
-  if (params.maxPrice) result = result.filter((item) => item.price <= Number(params.maxPrice));
-  if (params.sort === 'price-low') result.sort((a, b) => a.price - b.price);
-  if (params.sort === 'price-high') result.sort((a, b) => b.price - a.price);
-  if (!params.sort || params.sort === 'newest') result.sort((a, b) => new Date(b.postedAt) - new Date(a.postedAt));
-  return result;
+const imageUrl = (image) => (typeof image === 'string' ? image : image?.url);
+
+export const normalizeProduct = (product) => {
+  if (!product) return product;
+  return {
+    ...product,
+    id: product._id || product.id,
+    postedAt: product.createdAt || product.postedAt,
+    images: product.images?.length ? product.images.map(imageUrl).filter(Boolean) : [fallbackImage],
+    seller: product.seller
+      ? {
+          ...product.seller,
+          id: product.seller._id || product.seller.id,
+          avatar: product.seller.profileImage?.url || product.seller.avatar,
+        }
+      : { name: 'VSSUT seller' },
+  };
 };
 
+const toProductParams = (params = {}) => ({
+  keyword: params.query || undefined,
+  category: params.category || undefined,
+  minPrice: params.minPrice || undefined,
+  maxPrice: params.maxPrice || undefined,
+  sort: params.sort || undefined,
+  page: params.page || undefined,
+  limit: params.limit || undefined,
+});
+
+const toFormData = (payload) => {
+  const formData = new globalThis.FormData();
+  ['title', 'description', 'price', 'category', 'location'].forEach((field) => {
+    if (payload[field] !== undefined && payload[field] !== '') formData.append(field, payload[field]);
+  });
+  payload.images?.forEach((image) => {
+    if (image instanceof globalThis.File) formData.append('images', image);
+  });
+  return formData;
+};
+
+const hasFileImages = (payload) => payload.images?.some((image) => image instanceof globalThis.File);
+
 export const productService = {
-  getProducts: async (params) => mockDelay({ items: filterProducts(productDb, params), total: filterProducts(productDb, params).length }),
-  getFeatured: async () => mockDelay(productDb.filter((item) => item.featured)),
-  getLatest: async () => mockDelay([...productDb].sort((a, b) => new Date(b.postedAt) - new Date(a.postedAt)).slice(0, 6)),
-  getProductById: async (id) => mockDelay(productDb.find((item) => item.id === id)),
-  getRelated: async (product) => mockDelay(productDb.filter((item) => item.category === product?.category && item.id !== product.id).slice(0, 4)),
+  getProducts: async (params) => {
+    const { data } = await api.get('/products', { params: toProductParams(params) });
+    const items = data.products.map(normalizeProduct);
+    return { items, total: data.meta.total, meta: data.meta };
+  },
+  getFeatured: async () => {
+    const { items } = await productService.getProducts({ sort: 'popular', limit: 4 });
+    return items;
+  },
+  getLatest: async () => {
+    const { items } = await productService.getProducts({ sort: 'newest', limit: 8 });
+    return items;
+  },
+  getProductById: async (id) => {
+    const { data } = await api.get(`/products/${id}`);
+    return normalizeProduct(data.product);
+  },
+  getRelated: async (product) => {
+    if (!product?.category) return [];
+    const { items } = await productService.getProducts({ category: product.category, limit: 4 });
+    return items.filter((item) => item.id !== product.id).slice(0, 4);
+  },
   createProduct: async (payload) => {
-    const product = {
-      id: crypto.randomUUID(),
-      postedAt: new Date().toISOString(),
-      featured: false,
-      condition: 'Good',
-      images: payload.images?.length ? payload.images : ['https://images.unsplash.com/photo-1556742502-ec7c0e9f34b1?auto=format&fit=crop&w=900&q=80'],
-      seller: { id: 'me', name: 'You', avatar: 'https://i.pravatar.cc/120?img=5', rating: 5 },
-      ...payload,
-      price: Number(payload.price),
-    };
-    productDb = [product, ...productDb];
-    return mockDelay(product);
+    const body = hasFileImages(payload) ? toFormData(payload) : payload;
+    const { data } = await api.post('/products', body);
+    return normalizeProduct(data.product);
   },
   updateProduct: async (id, payload) => {
-    productDb = productDb.map((item) => (item.id === id ? { ...item, ...payload, price: Number(payload.price) } : item));
-    return mockDelay(productDb.find((item) => item.id === id));
+    const body = hasFileImages(payload) ? toFormData(payload) : payload;
+    const { data } = await api.put(`/products/${id}`, body);
+    return normalizeProduct(data.product);
   },
   deleteProduct: async (id) => {
-    productDb = productDb.filter((item) => item.id !== id);
-    return mockDelay({ ok: true });
+    const { data } = await api.delete(`/products/${id}`);
+    return data;
+  },
+  markSold: async (id) => {
+    const { data } = await api.patch(`/products/${id}/sold`);
+    return normalizeProduct(data.product);
   },
 };

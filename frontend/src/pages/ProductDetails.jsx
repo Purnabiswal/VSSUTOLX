@@ -29,7 +29,7 @@ export default function ProductDetails() {
             <p className="text-sm font-semibold uppercase text-primary">{currentProduct.category}</p>
             <h1 className="mt-2 text-3xl font-extrabold text-secondary">{currentProduct.title}</h1>
             <p className="mt-2 text-3xl font-extrabold text-primary">{formatCurrency(currentProduct.price)}</p>
-            <p className="mt-4 text-sm text-slate-500">{currentProduct.location} · Posted {formatDate(currentProduct.postedAt)} · {currentProduct.condition}</p>
+            <p className="mt-4 text-sm text-slate-500">{currentProduct.location} · Posted {formatDate(currentProduct.postedAt)} · {currentProduct.status}</p>
             <p className="mt-5 text-slate-600">{currentProduct.description}</p>
             <div className="mt-6 grid gap-3 sm:grid-cols-2">
               <Button onClick={() => toggle(currentProduct.id)}><FaHeart /> Wishlist</Button>

@@ -7,16 +7,13 @@ import CategoryCard from '../components/CategoryCard';
 import Button from '../components/Button';
 import { categories } from '../constants/categories';
 import { useProductStore } from '../store/productStore';
-import { useWishlistStore } from '../store/wishlistStore';
 import { FaBars } from "react-icons/fa";
 
 export default function Home() {
   const { featured, latest, fetchHome } = useProductStore();
-  const fetchWishlist = useWishlistStore((state) => state.fetchWishlist);
   useEffect(() => {
     fetchHome();
-    fetchWishlist();
-  }, [fetchHome, fetchWishlist]);
+  }, [fetchHome]);
 
   return (
     <>

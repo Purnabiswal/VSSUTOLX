@@ -1,12 +1,17 @@
-import { mockDelay } from './api';
-import { products } from '../data/mockData';
-
-let ids = ['p1', 'p3'];
+import api from './api';
+import { normalizeProduct } from './productService';
 
 export const wishlistService = {
-  getWishlist: async () => mockDelay(products.filter((product) => ids.includes(product.id))),
-  toggleWishlist: async (productId) => {
-    ids = ids.includes(productId) ? ids.filter((id) => id !== productId) : [...ids, productId];
-    return mockDelay({ ids });
+  getWishlist: async () => {
+    const { data } = await api.get('/wishlist');
+    return data.wishlist.map(normalizeProduct);
+  },
+  addToWishlist: async (productId) => {
+    const { data } = await api.post(`/wishlist/${productId}`);
+    return data.wishlist.map((id) => id.toString());
+  },
+  removeFromWishlist: async (productId) => {
+    const { data } = await api.delete(`/wishlist/${productId}`);
+    return data.wishlist.map((id) => id.toString());
   },
 };

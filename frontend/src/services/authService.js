@@ -1,21 +1,49 @@
-import { mockDelay } from './api';
-import { users } from '../data/mockData';
+import api, { TOKEN_STORAGE_KEY } from "./api";
+
+const storeTokens = (data) => {
+  if (data.accessToken) localStorage.setItem(TOKEN_STORAGE_KEY, data.accessToken);
+  if (data.refreshToken) localStorage.setItem(`${TOKEN_STORAGE_KEY}_refresh`, data.refreshToken);
+};
+
+const clearTokens = () => {
+  localStorage.removeItem(TOKEN_STORAGE_KEY);
+  localStorage.removeItem(`${TOKEN_STORAGE_KEY}_refresh`);
+};
 
 export const authService = {
-  login: async ({ email }) => {
-    const user = users.find((item) => item.email === email) || users[0];
-    localStorage.setItem('vssut_olx_token', 'mock-vssut-token');
-    return mockDelay({ user, token: 'mock-vssut-token' });
-  },
   register: async (payload) => {
-    const user = { id: crypto.randomUUID(), role: 'user', avatar: 'https://i.pravatar.cc/120?img=5', ...payload };
-    localStorage.setItem('vssut_olx_token', 'mock-vssut-token');
-    return mockDelay({ user, token: 'mock-vssut-token' });
+    const { data } = await api.post("/auth/register", payload);
+    storeTokens(data);
+    return data;
   },
-  forgotPassword: async (email) => mockDelay({ ok: true, message: `Reset link sent to ${email}` }),
+
+  login: async (payload) => {
+    const { data } = await api.post("/auth/login", payload);
+    storeTokens(data);
+    return data;
+  },
+
   logout: async () => {
-    localStorage.removeItem('vssut_olx_token');
-    return mockDelay({ ok: true });
+    try {
+      await api.post("/auth/logout");
+    } finally {
+      clearTokens();
+    }
   },
-  me: async () => mockDelay({ user: users[0] }),
+
+  me: async () => {
+    const { data } = await api.get("/auth/me");
+    return data;
+  },
+
+  forgotPassword: async (email) => {
+    const { data } = await api.post("/auth/forgot-password", { email });
+    return data;
+  },
+
+  resetPassword: async (payload) => {
+    const { data } = await api.post("/auth/reset-password", payload);
+    storeTokens(data);
+    return data;
+  },
 };

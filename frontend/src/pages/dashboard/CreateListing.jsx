@@ -9,16 +9,35 @@ import Textarea from '../../components/Textarea';
 import ProductCard from '../../components/ProductCard';
 import { categories, locations } from '../../constants/categories';
 import { useProductStore } from '../../store/productStore';
+import { useNotificationStore } from '../../store/notificationStore';
 import { priceValidation, required } from '../../utils/validators';
 
 export default function CreateListing() {
-  const [imageText, setImageText] = useState('');
-  const { register, handleSubmit, watch, formState: { errors } } = useForm({ defaultValues: { category: 'books', location: locations[0] } });
+  const [images, setImages] = useState([]);
+  const { register, handleSubmit, watch, formState: { errors } } = useForm({ defaultValues: { category: 'Books', location: locations[0] } });
   const createProduct = useProductStore((state) => state.createProduct);
+  const pushToast = useNotificationStore((state) => state.pushToast);
   const navigate = useNavigate();
-  const images = useMemo(() => imageText.split('\n').map((item) => item.trim()).filter(Boolean), [imageText]);
-  const preview = { id: 'preview', title: watch('title') || 'Listing title', price: Number(watch('price')) || 0, category: watch('category') || 'books', seller: { name: 'You' }, postedAt: new Date().toISOString(), images: images.length ? images : ['https://images.unsplash.com/photo-1556742502-ec7c0e9f34b1?auto=format&fit=crop&w=900&q=80'] };
-  const onSubmit = async (data) => { const product = await createProduct({ ...data, images }); navigate(`/products/${product.id}`); };
+  const imagePreviews = useMemo(() => images.map((image) => globalThis.URL.createObjectURL(image)), [images]);
+  const preview = {
+    id: 'preview',
+    title: watch('title') || 'Listing title',
+    price: Number(watch('price')) || 0,
+    category: watch('category') || 'Books',
+    seller: { name: 'You' },
+    postedAt: new Date().toISOString(),
+    images: imagePreviews.length ? imagePreviews : ['https://images.unsplash.com/photo-1556742502-ec7c0e9f34b1?auto=format&fit=crop&w=900&q=80'],
+  };
+
+  const onSubmit = async (data) => {
+    try {
+      const product = await createProduct({ ...data, images });
+      navigate(`/products/${product.id}`);
+    } catch (err) {
+      pushToast({ message: err.message });
+    }
+  };
+
   return (
     <div>
       <SEO title="Create Listing" />
@@ -30,7 +49,7 @@ export default function CreateListing() {
           <Input label="Price" type="number" {...register('price', priceValidation)} error={errors.price?.message} />
           <Select label="Category" {...register('category')}>{categories.map((item) => <option key={item.id} value={item.id}>{item.name}</option>)}</Select>
           <Select label="Location" {...register('location')}>{locations.map((item) => <option key={item} value={item}>{item}</option>)}</Select>
-          <Textarea label="Multiple Images" placeholder="Paste one image URL per line" value={imageText} onChange={(event) => setImageText(event.target.value)} />
+          <Input label="Images" type="file" accept="image/*" multiple onChange={(event) => setImages(Array.from(event.target.files || []).slice(0, 6))} />
           <Button type="submit">Publish Listing</Button>
         </form>
         <div><p className="mb-3 font-bold text-secondary">Preview</p><ProductCard product={preview} /></div>

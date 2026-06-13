@@ -3,29 +3,47 @@ import { productService } from '../services/productService';
 
 export const useProductStore = create((set) => ({
   products: [],
+  meta: null,
   featured: [],
   latest: [],
   currentProduct: null,
   related: [],
   loading: false,
+  error: null,
   fetchProducts: async (params) => {
-    set({ loading: true });
-    const data = await productService.getProducts(params);
-    set({ products: data.items, loading: false });
-    return data;
+    set({ loading: true, error: null });
+    try {
+      const data = await productService.getProducts(params);
+      set({ products: data.items, meta: data.meta, loading: false });
+      return data;
+    } catch (error) {
+      set({ error: error.message, loading: false });
+      throw error;
+    }
   },
   fetchHome: async () => {
-    set({ loading: true });
-    const [featured, latest] = await Promise.all([productService.getFeatured(), productService.getLatest()]);
-    set({ featured, latest, loading: false });
+    set({ loading: true, error: null });
+    try {
+      const [featured, latest] = await Promise.all([productService.getFeatured(), productService.getLatest()]);
+      set({ featured, latest, loading: false });
+    } catch (error) {
+      set({ error: error.message, loading: false });
+    }
   },
   fetchProduct: async (id) => {
-    set({ loading: true });
-    const product = await productService.getProductById(id);
-    const related = await productService.getRelated(product);
-    set({ currentProduct: product, related, loading: false });
-    return product;
+    set({ loading: true, error: null });
+    try {
+      const product = await productService.getProductById(id);
+      const related = await productService.getRelated(product);
+      set({ currentProduct: product, related, loading: false });
+      return product;
+    } catch (error) {
+      set({ error: error.message, loading: false });
+      throw error;
+    }
   },
   createProduct: productService.createProduct,
   updateProduct: productService.updateProduct,
+  deleteProduct: productService.deleteProduct,
+  markSold: productService.markSold,
 }));
