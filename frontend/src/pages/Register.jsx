@@ -17,7 +17,9 @@ export default function Register() {
       <form onSubmit={handleSubmit(onSubmit)} className="surface w-full max-w-lg rounded-md p-6">
         <h1 className="text-2xl font-extrabold text-secondary">Create Account</h1>
         <div className="mt-6 grid gap-4 sm:grid-cols-2">
-          <Input label="Full name" {...register('name', required('Name'))} error={errors.name?.message} />
+          <input
+  {...register('name', required('Name'))}
+/>
           <Input label="Department" {...register('department', required('Department'))} error={errors.department?.message} />
           <Input label="Email" className="sm:col-span-2" {...register('email', emailValidation)} error={errors.email?.message} />
           <Input label="Password" type="password" className="sm:col-span-2" {...register('password', required('Password'))} error={errors.password?.message} />
