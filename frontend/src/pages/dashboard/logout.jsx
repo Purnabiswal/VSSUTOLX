@@ -17,7 +17,7 @@ export default function Logout() {
 
   return (
     <div className="flex items-center justify-center py-20">
-      Logging out...
+      Logging out... 
     </div>
   );
 }
