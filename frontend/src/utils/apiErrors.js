@@ -7,6 +7,11 @@ const statusMessages = {
   500: 'Server error. Please try again.',
 };
 
+export function apiErrorDetails(error) {
+  const details = error?.details || error?.response?.data?.details || error?.response?.data?.errors || [];
+  return Array.isArray(details) ? details : [];
+}
+
 export function parseApiError(error) {
   const status = error?.response?.status;
   const data = error?.response?.data;
@@ -20,4 +25,13 @@ export function parseApiError(error) {
 
 export function errorMessage(error) {
   return error?.message || parseApiError(error).message;
+}
+
+export function fieldErrors(error) {
+  return apiErrorDetails(error).reduce((fields, item) => {
+    const key = item.path || item.param || item.field;
+    const message = item.msg || item.message;
+    if (key && message) fields[key] = message;
+    return fields;
+  }, {});
 }

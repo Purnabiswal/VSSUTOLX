@@ -21,6 +21,10 @@ export const productCreateValidator = [
   body('price').isFloat({ min: 0 }).toFloat().withMessage('Valid price is required'),
   body('category').isIn(PRODUCT_CATEGORIES).withMessage('Valid category is required'),
   body('location').trim().isLength({ min: 2, max: 120 }).withMessage('Location is required'),
+  body('images').custom((_value, { req }) => {
+    if (!req.files?.length) throw new Error('At least one image is required');
+    return true;
+  }),
 ];
 
 export const productUpdateValidator = [

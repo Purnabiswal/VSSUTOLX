@@ -1,4 +1,5 @@
 import { useEffect } from 'react';
+import { Link } from 'react-router-dom';
 import { FaShieldAlt, FaUsers, FaTags } from 'react-icons/fa';
 import SEO from '../components/SEO';
 import SearchBar from '../components/SearchBar';
@@ -25,20 +26,22 @@ export default function Home() {
         <div className="container-page">
           <div className="flex items-center gap-3 overflow-x-auto py-3 scrollbar-hide">
 
-            <button
+            <Link
+              to="/products"
               className="flex shrink-0 items-center gap-2 rounded-full bg-primary px-5 py-2.5 text-sm font-semibold text-white"
             >
               <FaBars />
               ALL CATEGORIES
-            </button>
+            </Link>
 
             {categories.map((category) => (
-              <button
+              <Link
                 key={category.id}
+                to={`/products?category=${encodeURIComponent(category.id)}`}
                 className="shrink-0 rounded-full border border-slate-300 bg-white px-5 py-2.5 text-sm text-slate-700 transition hover:bg-slate-100"
               >
                 {category.name}
-              </button>
+              </Link>
             ))}
           </div>
         </div>

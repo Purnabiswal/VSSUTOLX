@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Link, NavLink } from 'react-router-dom';
+import { Link, NavLink, useNavigate } from 'react-router-dom';
 import { FaBars, FaBell, FaEnvelope, FaUserCircle } from 'react-icons/fa';
 import { publicNav } from '../constants/navigation';
 import { categories } from '../constants/categories';
@@ -11,6 +11,7 @@ import SearchBar from './SearchBar';
 
 export default function Navbar() {
   const [open, setOpen] = useState(false);
+  const navigate = useNavigate();
   const user = useAuthStore((state) => state.user);
   const hydrate = useAuthStore((state) => state.hydrate);
   const unreadCount = useNotificationStore((state) => state.unreadCount);
@@ -24,7 +25,7 @@ export default function Navbar() {
       {publicNav.map((item) => (
         <NavLink key={item.to} to={item.to} className={({ isActive }) => `text-sm font-semibold ${isActive ? 'text-primary' : 'text-slate-600 hover:text-primary'}`}>{item.label}</NavLink>
       ))}
-      <select className="rounded-md border border-slate-200 bg-white px-2 py-2 text-sm font-semibold text-slate-600" onChange={(event) => event.target.value && (window.location.href = `/products?category=${event.target.value}`)} defaultValue="">
+      <select className="rounded-md border border-slate-200 bg-white px-2 py-2 text-sm font-semibold text-slate-600" onChange={(event) => event.target.value && navigate(`/products?category=${encodeURIComponent(event.target.value)}`)} defaultValue="">
         <option value="">Categories</option>
         {categories.map((item) => <option key={item.id} value={item.id}>{item.name}</option>)}
       </select>

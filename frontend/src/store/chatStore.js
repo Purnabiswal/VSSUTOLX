@@ -17,6 +17,17 @@ export const useChatStore = create((set) => ({
     const activeConversation = await chatService.getConversation(id, currentUserId);
     set({ activeConversation });
   },
+  createConversation: async (payload) => {
+    const currentUserId = useAuthStore.getState().user?.id;
+    const conversation = await chatService.createConversation(payload, currentUserId);
+    set((state) => ({
+      activeConversation: conversation,
+      conversations: state.conversations.some((item) => item.id === conversation.id)
+        ? state.conversations.map((item) => (item.id === conversation.id ? conversation : item))
+        : [conversation, ...state.conversations],
+    }));
+    return conversation;
+  },
   sendMessage: async (id, text) => {
     const message = await chatService.sendMessage(id, text);
     set((state) => ({

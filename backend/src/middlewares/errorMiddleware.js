@@ -5,16 +5,20 @@ export const notFound = (req, _res, next) => {
 };
 
 export const errorMiddleware = (err, _req, res, _next) => {
-  const statusCode = err.statusCode || 500;
+  const isMulterError = err.name === 'MulterError';
+  const multerMessages = {
+    LIMIT_FILE_SIZE: 'Each image must be 3MB or smaller',
+    LIMIT_FILE_COUNT: 'You can upload up to 6 images',
+    LIMIT_UNEXPECTED_FILE: 'Image field name must be images',
+  };
+  const statusCode = err.statusCode || (isMulterError ? 400 : 500);
   const payload = {
     success: false,
-    message: err.isOperational ? err.message : 'Internal server error',
+    message: err.isOperational || isMulterError ? (multerMessages[err.code] || err.message) : 'Internal server error',
   };
 
-  if (process.env.NODE_ENV !== 'production') {
-    payload.stack = err.stack;
-    payload.details = err.errors;
-  }
+  if (err.errors) payload.details = err.errors;
+  if (process.env.NODE_ENV !== 'production') payload.stack = err.stack;
 
   res.status(statusCode).json(payload);
 };

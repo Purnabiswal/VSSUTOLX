@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import SEO from '../components/SEO';
 import ProductCard from '../components/ProductCard';
@@ -12,19 +12,34 @@ import { useProducts } from '../hooks/useProducts';
 import { useDebounce } from '../hooks/useDebounce';
 
 export default function Products() {
-  const [params] = useSearchParams();
+  const [params, setParams] = useSearchParams();
   const [query, setQuery] = useState(params.get('q') || '');
   const [category, setCategory] = useState(params.get('category') || '');
-  const [minPrice, setMinPrice] = useState('');
-  const [maxPrice, setMaxPrice] = useState('');
-  const [sort, setSort] = useState('newest');
-  const [page, setPage] = useState(1);
+  const [minPrice, setMinPrice] = useState(params.get('minPrice') || '');
+  const [maxPrice, setMaxPrice] = useState(params.get('maxPrice') || '');
+  const [sort, setSort] = useState(params.get('sort') || 'newest');
+  const [page, setPage] = useState(Number(params.get('page')) || 1);
   const debouncedQuery = useDebounce(query);
   const debouncedMinPrice = useDebounce(minPrice);
   const debouncedMaxPrice = useDebounce(maxPrice);
   const { products, loading } = useProducts({ query: debouncedQuery, category, sort, minPrice: debouncedMinPrice, maxPrice: debouncedMaxPrice });
   const pageSize = 6;
   const paged = useMemo(() => products.slice((page - 1) * pageSize, page * pageSize), [products, page]);
+
+  useEffect(() => {
+    const next = {};
+    if (debouncedQuery) next.q = debouncedQuery;
+    if (category) next.category = category;
+    if (debouncedMinPrice) next.minPrice = debouncedMinPrice;
+    if (debouncedMaxPrice) next.maxPrice = debouncedMaxPrice;
+    if (sort && sort !== 'newest') next.sort = sort;
+    if (page > 1) next.page = String(page);
+    setParams(next, { replace: true });
+  }, [category, debouncedMaxPrice, debouncedMinPrice, debouncedQuery, page, setParams, sort]);
+
+  useEffect(() => {
+    setPage(1);
+  }, [category, debouncedMaxPrice, debouncedMinPrice, debouncedQuery, sort]);
 
   return (
     <section className="container-page py-8">

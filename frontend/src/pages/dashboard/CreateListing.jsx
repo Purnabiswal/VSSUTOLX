@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { useNavigate } from 'react-router-dom';
 import SEO from '../../components/SEO';
@@ -11,14 +11,16 @@ import { categories, locations } from '../../constants/categories';
 import { useProductStore } from '../../store/productStore';
 import { useNotificationStore } from '../../store/notificationStore';
 import { priceValidation, required } from '../../utils/validators';
+import { fieldErrors } from '../../utils/apiErrors';
 
 export default function CreateListing() {
   const [images, setImages] = useState([]);
-  const { register, handleSubmit, watch, formState: { errors } } = useForm({ defaultValues: { category: 'Books', location: locations[0] } });
+  const { register, handleSubmit, watch, setError, formState: { errors } } = useForm({ defaultValues: { category: 'Books', location: locations[0] } });
   const createProduct = useProductStore((state) => state.createProduct);
   const pushToast = useNotificationStore((state) => state.pushToast);
   const navigate = useNavigate();
   const imagePreviews = useMemo(() => images.map((image) => globalThis.URL.createObjectURL(image)), [images]);
+  useEffect(() => () => imagePreviews.forEach((url) => globalThis.URL.revokeObjectURL(url)), [imagePreviews]);
   const preview = {
     id: 'preview',
     title: watch('title') || 'Listing title',
@@ -31,9 +33,15 @@ export default function CreateListing() {
 
   const onSubmit = async (data) => {
     try {
+      if (!images.length) {
+        setError('images', { type: 'manual', message: 'At least one image is required' });
+        pushToast({ message: 'At least one image is required' });
+        return;
+      }
       const product = await createProduct({ ...data, images });
       navigate(`/products/${product.id}`);
     } catch (err) {
+      Object.entries(fieldErrors(err)).forEach(([field, message]) => setError(field, { type: 'server', message }));
       pushToast({ message: err.message });
     }
   };
@@ -49,7 +57,7 @@ export default function CreateListing() {
           <Input label="Price" type="number" {...register('price', priceValidation)} error={errors.price?.message} />
           <Select label="Category" {...register('category')}>{categories.map((item) => <option key={item.id} value={item.id}>{item.name}</option>)}</Select>
           <Select label="Location" {...register('location')}>{locations.map((item) => <option key={item} value={item}>{item}</option>)}</Select>
-          <Input label="Images" type="file" accept="image/*" multiple onChange={(event) => setImages(Array.from(event.target.files || []).slice(0, 6))} />
+          <Input label="Images" type="file" accept="image/*" multiple onChange={(event) => setImages(Array.from(event.target.files || []).slice(0, 6))} error={errors.images?.message} />
           <Button type="submit">Publish Listing</Button>
         </form>
         <div><p className="mb-3 font-bold text-secondary">Preview</p><ProductCard product={preview} /></div>

@@ -11,6 +11,7 @@ import { categories, locations } from '../../constants/categories';
 import { useProductStore } from '../../store/productStore';
 import { useNotificationStore } from '../../store/notificationStore';
 import { priceValidation, required } from '../../utils/validators';
+import { fieldErrors } from '../../utils/apiErrors';
 
 export default function EditListing() {
   const { id } = useParams();
@@ -18,7 +19,7 @@ export default function EditListing() {
   const [images, setImages] = useState([]);
   const { currentProduct, loading, fetchProduct, updateProduct } = useProductStore();
   const pushToast = useNotificationStore((state) => state.pushToast);
-  const { register, handleSubmit, reset, formState: { errors } } = useForm();
+  const { register, handleSubmit, reset, setError, formState: { errors } } = useForm();
 
   useEffect(() => {
     fetchProduct(id).then((product) => {
@@ -37,6 +38,7 @@ export default function EditListing() {
       const product = await updateProduct(id, { ...data, images });
       navigate(`/products/${product.id}`);
     } catch (err) {
+      Object.entries(fieldErrors(err)).forEach(([field, message]) => setError(field, { type: 'server', message }));
       pushToast({ message: err.message });
     }
   };

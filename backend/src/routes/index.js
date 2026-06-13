@@ -7,6 +7,8 @@ import chatRoutes from './chatRoutes.js';
 import messageRoutes from './messageRoutes.js';
 import reportRoutes from './reportRoutes.js';
 import adminRoutes from './adminRoutes.js';
+import notificationRoutes from './notificationRoutes.js';
+import contactRoutes from './contactRoutes.js';
 
 const router = Router();
 
@@ -18,5 +20,7 @@ router.use('/chats', chatRoutes);
 router.use('/messages', messageRoutes);
 router.use('/reports', reportRoutes);
 router.use('/admin', adminRoutes);
+router.use('/notifications', notificationRoutes);
+router.use('/contact', contactRoutes);
 
 export default router;
