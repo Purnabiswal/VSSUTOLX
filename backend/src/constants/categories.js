@@ -2,11 +2,13 @@ export const PRODUCT_CATEGORIES = [
   'Books',
   'Electronics',
   'Cycles',
+  'Furniture',
+  'Sports',
+  'Hostel Essentials',
   'Hostel Items',
   'Lab Equipment',
   'Project Components',
   'Notes',
-  'Furniture',
   'Others',
 ];
 

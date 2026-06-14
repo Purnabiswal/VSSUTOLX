@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import SEO from '../../components/SEO';
-import { adminService } from '../../services/adminService';
+import { adminService } from '../../services';
 
 export default function AdminDashboard() {
   const [data, setData] = useState(null);

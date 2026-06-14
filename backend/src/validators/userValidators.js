@@ -5,9 +5,14 @@ export const userIdValidator = [
 ];
 
 export const updateProfileValidator = [
-  body('name').optional().trim().isLength({ min: 2, max: 80 }),
-  body('branch').optional().trim().isLength({ max: 80 }),
+  body('name').optional().trim().isLength({ min: 2, max: 80 }).withMessage('Name must be between 2 and 80 characters'),
+  body('branch').optional().trim().isLength({ max: 80 }).withMessage('Branch must be at most 80 characters'),
   body('year').optional().isInt({ min: 1, max: 5 }).toInt(),
+  body('whatsappNumber')
+    .optional({ values: 'falsy' })
+    .trim()
+    .matches(/^[6-9]\d{9}$/)
+    .withMessage('WhatsApp number must be a valid Indian mobile number'),
 ];
 
 export const changePasswordValidator = [

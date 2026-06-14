@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
-import { FaFlag, FaHeart, FaRegHeart, FaShareAlt } from 'react-icons/fa';
+import { useParams } from 'react-router-dom';
+import { FaFlag, FaHeart, FaRegHeart, FaShareAlt, FaWhatsapp } from 'react-icons/fa';
 import SEO from '../components/SEO';
 import Breadcrumb from '../components/Breadcrumb';
 import Button from '../components/Button';
@@ -14,13 +14,12 @@ import { useProductStore } from '../store/productStore';
 import { useWishlistStore } from '../store/wishlistStore';
 import { useAuthStore } from '../store/authStore';
 import { useNotificationStore } from '../store/notificationStore';
-import { useChatStore } from '../store/chatStore';
-import { reportService } from '../services/reportService';
+import { reportService } from '../services';
 import { formatCurrency, formatDate } from '../utils/formatters';
+import { buildWhatsappLink } from '../utils/whatsapp';
 
 export default function ProductDetails() {
   const { id } = useParams();
-  const navigate = useNavigate();
   const [reportOpen, setReportOpen] = useState(false);
   const [reportReason, setReportReason] = useState('');
   const [submittingReport, setSubmittingReport] = useState(false);
@@ -29,11 +28,13 @@ export default function ProductDetails() {
   const toggle = useWishlistStore((state) => state.toggle);
   const user = useAuthStore((state) => state.user);
   const pushToast = useNotificationStore((state) => state.pushToast);
-  const createConversation = useChatStore((state) => state.createConversation);
   useEffect(() => { fetchProduct(id); }, [fetchProduct, id]);
   if (loading || !currentProduct) return <Loader />;
   const wished = ids.includes(currentProduct.id);
-  const sellerId = currentProduct.seller?.id || currentProduct.seller?._id;
+  const whatsappLink = buildWhatsappLink({
+    number: currentProduct.seller?.whatsappNumber,
+    productTitle: currentProduct.title,
+  });
 
   const requireAuth = () => {
     if (user) return true;
@@ -62,20 +63,6 @@ export default function ProductDetails() {
       pushToast({ message: 'Product link copied' });
     } catch (error) {
       if (error.name !== 'AbortError') pushToast({ message: error.message || 'Unable to share product' });
-    }
-  };
-
-  const handleChat = async () => {
-    if (!requireAuth()) return;
-    if (!sellerId) {
-      pushToast({ message: 'Seller information is unavailable' });
-      return;
-    }
-    try {
-      const conversation = await createConversation({ participantId: sellerId, productId: currentProduct.id });
-      navigate(`/dashboard/messages/${conversation.id}`);
-    } catch (error) {
-      pushToast({ message: error.message });
     }
   };
 
@@ -110,7 +97,11 @@ export default function ProductDetails() {
             <p className="mt-5 text-slate-600">{currentProduct.description}</p>
             <div className="mt-6 grid gap-3 sm:grid-cols-2">
               <Button onClick={handleWishlist}>{wished ? <FaHeart /> : <FaRegHeart />} {wished ? 'Wishlisted' : 'Wishlist'}</Button>
-              <Button onClick={handleChat} variant="secondary">Chat Seller</Button>
+              {whatsappLink ? (
+                <Button as="a" href={whatsappLink} target="_blank" rel="noreferrer" variant="secondary"><FaWhatsapp /> Contact Seller</Button>
+              ) : (
+                <p className="rounded-md bg-slate-50 px-3 py-2 text-sm font-semibold text-slate-500">Seller has not shared WhatsApp number.</p>
+              )}
               <Button onClick={handleShare} variant="outline"><FaShareAlt /> Share</Button>
               <Button onClick={() => (requireAuth() ? setReportOpen(true) : undefined)} variant="outline"><FaFlag /> Report</Button>
             </div>

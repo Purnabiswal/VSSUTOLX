@@ -1,12 +1,5 @@
 import { create } from 'zustand';
-import { notificationService } from '../services/notificationService';
-
-const normalizeNotification = (notification) => ({
-  ...notification,
-  id: notification._id || notification.id,
-  title: notification.type || 'Notification',
-  body: notification.message || notification.body,
-});
+import { notificationService } from '../services';
 
 export const useNotificationStore = create((set) => ({
   notifications: [],
@@ -29,7 +22,7 @@ export const useNotificationStore = create((set) => ({
     return notifications;
   },
   addNotification: (notification) => set((state) => ({
-    notifications: [normalizeNotification(notification), ...state.notifications],
+    notifications: [notificationService.normalize(notification), ...state.notifications],
     unreadCount: state.unreadCount + (notification.read ? 0 : 1),
   })),
   markAllRead: async () => {

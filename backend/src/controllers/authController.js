@@ -11,6 +11,7 @@ const publicUser = (user) => ({
   role: user.role,
   branch: user.branch,
   year: user.year,
+  whatsappNumber: user.whatsappNumber,
   profileImage: user.profileImage,
   wishlist: user.wishlist,
   createdAt: user.createdAt,

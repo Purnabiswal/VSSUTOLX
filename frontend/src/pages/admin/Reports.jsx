@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import SEO from '../../components/SEO';
 import Badge from '../../components/Badge';
-import { adminService } from '../../services/adminService';
+import { adminService } from '../../services';
 
 export default function Reports() {
   const [reports, setReports] = useState([]);

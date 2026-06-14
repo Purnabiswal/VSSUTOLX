@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import SEO from '../../components/SEO';
 import Avatar from '../../components/Avatar';
 import Badge from '../../components/Badge';
-import { adminService } from '../../services/adminService';
+import { adminService } from '../../services';
 
 export default function ManageUsers() {
   const [users, setUsers] = useState([]);

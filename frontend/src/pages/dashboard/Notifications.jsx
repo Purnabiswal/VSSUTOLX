@@ -5,10 +5,8 @@ import Badge from '../../components/Badge';
 import EmptyState from '../../components/EmptyState';
 import { useNotificationStore } from '../../store/notificationStore';
 import { formatDate } from '../../utils/formatters';
-import { useSocket } from '../../hooks/useSocket';
 
 export default function Notifications() {
-  useSocket();
   const { notifications, fetchNotifications, markAllRead } = useNotificationStore();
   useEffect(() => { fetchNotifications(); }, [fetchNotifications]);
   return (

@@ -1,10 +1,7 @@
 import { useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { FaShieldAlt, FaUsers, FaTags } from 'react-icons/fa';
 import SEO from '../components/SEO';
-import SearchBar from '../components/SearchBar';
 import ProductCard from '../components/ProductCard';
-import CategoryCard from '../components/CategoryCard';
 import Button from '../components/Button';
 import { categories } from '../constants/categories';
 import { useProductStore } from '../store/productStore';
@@ -23,8 +20,8 @@ export default function Home() {
 
 
       <section className="border-y bg-white">
-        <div className="container-page">
-          <div className="flex items-center gap-3 overflow-x-auto py-3 scrollbar-hide">
+        <div className="w-full px-6 lg:px-10">
+          <div className="flex flex-wrap justify-center items-center gap-3 py-3">
 
             <Link
               to="/products"
@@ -92,7 +89,7 @@ export default function Home() {
       </section>
       <section className="container-page py-12">
         <div className="grid gap-5 md:grid-cols-3">
-          {['Sold my cycle in one evening.', 'Found semester books at half price.', 'The chat made pickup coordination simple.'].map((quote, index) => (
+          {['Sold my cycle in one evening.', 'Found semester books at half price.', 'WhatsApp made pickup coordination simple.'].map((quote, index) => (
             <blockquote key={quote} className="surface rounded-md p-6 text-slate-600">"{quote}"<footer className="mt-4 font-bold text-secondary">Student {index + 1}</footer></blockquote>
           ))}
         </div>

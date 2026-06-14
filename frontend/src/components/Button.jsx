@@ -14,8 +14,9 @@ const sizes = {
   lg: 'h-12 px-5 text-base',
 };
 
-export default function Button({ children, variant = 'primary', size = 'md', className = '', to, type = 'button', ...props }) {
+export default function Button({ children, variant = 'primary', size = 'md', className = '', to, as, type = 'button', ...props }) {
   const classes = `inline-flex items-center justify-center gap-2 rounded-md font-semibold transition focus-ring disabled:cursor-not-allowed disabled:opacity-60 ${variants[variant]} ${sizes[size]} ${className}`;
   if (to) return <Link to={to} className={classes} {...props}>{children}</Link>;
+  if (as === 'a') return <a className={classes} {...props}>{children}</a>;
   return <button type={type} className={classes} {...props}>{children}</button>;
 }

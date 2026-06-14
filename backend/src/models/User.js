@@ -41,6 +41,11 @@ const userSchema = new mongoose.Schema(
       min: 1,
       max: 5,
     },
+    whatsappNumber: {
+      type: String,
+      trim: true,
+      match: [/^[6-9]\d{9}$/, 'WhatsApp number must be a valid Indian mobile number'],
+    },
     profileImage: {
       url: String,
       publicId: String,

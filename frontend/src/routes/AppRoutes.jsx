@@ -25,8 +25,6 @@ const CreateListing = lazy(() => import('../pages/dashboard/CreateListing'));
 const EditListing = lazy(() => import('../pages/dashboard/EditListing'));
 const Wishlist = lazy(() => import('../pages/dashboard/Wishlist'));
 const ProfileSettings = lazy(() => import('../pages/dashboard/ProfileSettings'));
-const Messages = lazy(() => import('../pages/dashboard/Messages'));
-const ChatRoom = lazy(() => import('../pages/dashboard/ChatRoom'));
 const Notifications = lazy(() => import('../pages/dashboard/Notifications'));
 
 const AdminDashboard = lazy(() => import('../pages/admin/AdminDashboard'));
@@ -63,8 +61,6 @@ export default function AppRoutes() {
           <Route path="listings/:id/edit" element={<EditListing />} />
           <Route path="wishlist" element={<Wishlist />} />
           <Route path="settings" element={<ProfileSettings />} />
-          <Route path="messages" element={<Messages />} />
-          <Route path="messages/:id" element={<ChatRoom />} />
           <Route path="notifications" element={<Notifications />} />
           <Route path="logout" element={<Logout />} />
         </Route>

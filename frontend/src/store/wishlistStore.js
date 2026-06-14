@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import { wishlistService } from '../services/wishlistService';
+import { wishlistService } from '../services';
 
 export const useWishlistStore = create((set, get) => ({
   items: [],

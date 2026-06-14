@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import { authService } from '../services/authService';
+import { authService } from '../services';
 import { TOKEN_STORAGE_KEY } from '../services/api';
 
 export const useAuthStore = create((set) => ({

@@ -10,7 +10,7 @@ export const getProducts = asyncHandler(async (req, res) => {
   const filter = buildProductQuery(req.query);
   const { page, limit, skip } = pagination(req.query);
   const [products, total] = await Promise.all([
-    Product.find(filter).populate('seller', 'name branch year profileImage').sort(sortBy(req.query)).skip(skip).limit(limit),
+    Product.find(filter).populate('seller', 'name branch year whatsappNumber profileImage').sort(sortBy(req.query)).skip(skip).limit(limit),
     Product.countDocuments(filter),
   ]);
 
@@ -22,12 +22,15 @@ export const getProducts = asyncHandler(async (req, res) => {
 });
 
 export const getProductById = asyncHandler(async (req, res) => {
-  const product = await Product.findByIdAndUpdate(req.params.id, { $inc: { views: 1 } }, { new: true }).populate('seller', 'name branch year profileImage');
+  const product = await Product.findByIdAndUpdate(req.params.id, { $inc: { views: 1 } }, { new: true }).populate('seller', 'name branch year whatsappNumber profileImage');
   if (!product) throw new AppError('Product not found', 404);
   res.status(200).json({ success: true, product });
 });
 
 export const createProduct = asyncHandler(async (req, res) => {
+  console.log("BODY:", req.body);
+  console.log("FILES:", req.files);
+  console.log("USER:", req.user);
   const images = req.files?.length
     ? await Promise.all(req.files.map((file) => uploadBufferToCloudinary(file)))
     : [];

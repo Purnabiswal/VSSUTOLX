@@ -2,7 +2,7 @@ import { useForm } from 'react-hook-form';
 import SEO from '../components/SEO';
 import Button from '../components/Button';
 import Input from '../components/Input';
-import { authService } from '../services/authService';
+import { authService } from '../services';
 import { useNotificationStore } from '../store/notificationStore';
 import { emailValidation } from '../utils/validators';
 

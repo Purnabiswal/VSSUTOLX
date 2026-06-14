@@ -4,7 +4,7 @@ import SEO from '../components/SEO';
 import Input from '../components/Input';
 import Textarea from '../components/Textarea';
 import Button from '../components/Button';
-import { contactService } from '../services/contactService';
+import { contactService } from '../services';
 import { emailValidation, required } from '../utils/validators';
 import { fieldErrors } from '../utils/apiErrors';
 

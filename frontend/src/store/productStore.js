@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import { productService } from '../services/productService';
+import { productService } from '../services';
 
 export const useProductStore = create((set) => ({
   products: [],

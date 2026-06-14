@@ -4,7 +4,7 @@ import SEO from '../../components/SEO';
 import Button from '../../components/Button';
 import Badge from '../../components/Badge';
 import Loader from '../../components/Loader';
-import { productService } from '../../services/productService';
+import { productService } from '../../services';
 import { useAuthStore } from '../../store/authStore';
 import { formatCurrency } from '../../utils/formatters';
 
