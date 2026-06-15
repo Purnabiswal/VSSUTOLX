@@ -92,7 +92,7 @@ export function CreateListing() {
     category: watch('category') || 'Books',
     seller: { name: 'You' },
     postedAt: new Date().toISOString(),
-    images: imagePreviews.length ? imagePreviews : ['/images/product-placeholder.jpg'],
+    images: imagePreviews.length ? imagePreviews : ['/images/product-placeholder.png'],
   };
 
   const onSubmit = async (data) => {
