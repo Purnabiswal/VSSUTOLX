@@ -1,6 +1,6 @@
 import api, { TOKEN_STORAGE_KEY } from './api';
 
-const fallbackImage = '/images/vssut-placeholder.jpg';
+const fallbackImage = '/images/product-placeholder.jpg';
 
 const storeTokens = (data) => {
   if (data.accessToken) localStorage.setItem(TOKEN_STORAGE_KEY, data.accessToken);
