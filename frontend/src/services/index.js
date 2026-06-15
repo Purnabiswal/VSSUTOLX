@@ -1,6 +1,6 @@
 import api, { TOKEN_STORAGE_KEY } from './api';
 
-const fallbackImage = 'https://images.unsplash.com/photo-1556742502-ec7c0e9f34b1?auto=format&fit=crop&w=900&q=80';
+const fallbackImage = '/images/vssut-placeholder.jpg';
 
 const storeTokens = (data) => {
   if (data.accessToken) localStorage.setItem(TOKEN_STORAGE_KEY, data.accessToken);

@@ -4,7 +4,8 @@ import { parseApiError } from '../utils';
 export const TOKEN_STORAGE_KEY = "vssut_olx_token";
 
 const api = axios.create({
-  baseURL: import.meta.env.VITE_API_URL || "http://localhost:5000/api",
+  // baseURL: import.meta.env.VITE_API_URL || "http://localhost:5000/api",
+  baseURL: import.meta.env.VITE_API_URL || "https://vssutolx.onrender.com/api",
   headers: {
     "Content-Type": "application/json",
   },
