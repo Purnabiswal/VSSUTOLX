@@ -1,12 +1,12 @@
 import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
-import SEO from '../components/SEO';
-import ProductCard from '../components/ProductCard';
-import ProfileCard from '../components/ProfileCard';
-import Loader from '../components/Loader';
+import { SEO } from '../components';
+import { ProductCard } from '../components';
+import { ProfileCard } from '../components';
+import { Loader } from '../components';
 import { userService } from '../services';
-import Button from '../components/Button';
-import { buildWhatsappLink } from '../utils/whatsapp';
+import { Button } from '../components';
+import { buildWhatsappLink } from '../utils';
 
 export default function SellerProfile() {
   const { id } = useParams();

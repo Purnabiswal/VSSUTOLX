@@ -1,22 +1,22 @@
 import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { FaFlag, FaHeart, FaRegHeart, FaShareAlt, FaWhatsapp } from 'react-icons/fa';
-import SEO from '../components/SEO';
-import Breadcrumb from '../components/Breadcrumb';
-import Button from '../components/Button';
-import ImageCarousel from '../components/ImageCarousel';
-import ProductCard from '../components/ProductCard';
-import ProfileCard from '../components/ProfileCard';
-import Loader from '../components/Loader';
-import Modal from '../components/Modal';
-import Textarea from '../components/Textarea';
-import { useProductStore } from '../store/productStore';
-import { useWishlistStore } from '../store/wishlistStore';
-import { useAuthStore } from '../store/authStore';
-import { useNotificationStore } from '../store/notificationStore';
+import { SEO } from '../components';
+import { Breadcrumb } from '../components';
+import { Button } from '../components';
+import { ImageCarousel } from '../components';
+import { ProductCard } from '../components';
+import { ProfileCard } from '../components';
+import { Loader } from '../components';
+import { Modal } from '../components';
+import { Textarea } from '../components';
+import { useProductStore } from '../store';
+import { useWishlistStore } from '../store';
+import { useAuthStore } from '../store';
+import { useNotificationStore } from '../store';
 import { reportService } from '../services';
-import { formatCurrency, formatDate } from '../utils/formatters';
-import { buildWhatsappLink } from '../utils/whatsapp';
+import { formatCurrency, formatDate } from '../utils';
+import { buildWhatsappLink } from '../utils';
 
 export default function ProductDetails() {
   const { id } = useParams();

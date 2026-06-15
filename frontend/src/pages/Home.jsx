@@ -1,10 +1,10 @@
 import { useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import SEO from '../components/SEO';
-import ProductCard from '../components/ProductCard';
-import Button from '../components/Button';
-import { categories } from '../constants/categories';
-import { useProductStore } from '../store/productStore';
+import { SEO } from '../components';
+import { ProductCard } from '../components';
+import { Button } from '../components';
+import { categories } from '../utils';
+import { useProductStore } from '../store';
 import { FaBars } from "react-icons/fa";
 
 export default function Home() {

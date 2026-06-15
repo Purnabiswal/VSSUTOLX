@@ -1,15 +1,23 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
-import SEO from '../components/SEO';
-import ProductCard from '../components/ProductCard';
-import Pagination from '../components/Pagination';
-import EmptyState from '../components/EmptyState';
-import Input from '../components/Input';
-import Select from '../components/Select';
-import Loader from '../components/Loader';
-import { categories, sortOptions } from '../constants/categories';
-import { useProducts } from '../hooks/useProducts';
-import { useDebounce } from '../hooks/useDebounce';
+import { SEO } from '../components';
+import { ProductCard } from '../components';
+import { Pagination } from '../components';
+import { EmptyState } from '../components';
+import { Input } from '../components';
+import { Select } from '../components';
+import { Loader } from '../components';
+import { categories, sortOptions } from '../utils';
+import { useProductStore } from '../store';
+
+function useDebouncedValue(value, delay = 350) {
+  const [debounced, setDebounced] = useState(value);
+  useEffect(() => {
+    const timer = window.setTimeout(() => setDebounced(value), delay);
+    return () => window.clearTimeout(timer);
+  }, [delay, value]);
+  return debounced;
+}
 
 export default function Products() {
   const [params, setParams] = useSearchParams();
@@ -19,12 +27,18 @@ export default function Products() {
   const [maxPrice, setMaxPrice] = useState(params.get('maxPrice') || '');
   const [sort, setSort] = useState(params.get('sort') || 'newest');
   const [page, setPage] = useState(Number(params.get('page')) || 1);
-  const debouncedQuery = useDebounce(query);
-  const debouncedMinPrice = useDebounce(minPrice);
-  const debouncedMaxPrice = useDebounce(maxPrice);
-  const { products, loading } = useProducts({ query: debouncedQuery, category, sort, minPrice: debouncedMinPrice, maxPrice: debouncedMaxPrice });
+  const debouncedQuery = useDebouncedValue(query);
+  const debouncedMinPrice = useDebouncedValue(minPrice);
+  const debouncedMaxPrice = useDebouncedValue(maxPrice);
+  const products = useProductStore((state) => state.products);
+  const loading = useProductStore((state) => state.loading);
+  const fetchProducts = useProductStore((state) => state.fetchProducts);
   const pageSize = 6;
   const paged = useMemo(() => products.slice((page - 1) * pageSize, page * pageSize), [products, page]);
+
+  useEffect(() => {
+    fetchProducts({ query: debouncedQuery, category, sort, minPrice: debouncedMinPrice, maxPrice: debouncedMaxPrice, limit: 50 });
+  }, [category, debouncedMaxPrice, debouncedMinPrice, debouncedQuery, fetchProducts, sort]);
 
   useEffect(() => {
     const next = {};

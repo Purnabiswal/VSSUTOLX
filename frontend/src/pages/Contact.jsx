@@ -1,12 +1,12 @@
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
-import SEO from '../components/SEO';
-import Input from '../components/Input';
-import Textarea from '../components/Textarea';
-import Button from '../components/Button';
+import { SEO } from '../components';
+import { Input } from '../components';
+import { Textarea } from '../components';
+import { Button } from '../components';
 import { contactService } from '../services';
-import { emailValidation, required } from '../utils/validators';
-import { fieldErrors } from '../utils/apiErrors';
+import { emailValidation, required } from '../utils';
+import { fieldErrors } from '../utils';
 
 export default function Contact() {
   const [status, setStatus] = useState(null);

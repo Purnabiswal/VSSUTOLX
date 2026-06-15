@@ -1,5 +1,5 @@
 import axios from "axios";
-import { parseApiError } from "../utils/apiErrors";
+import { parseApiError } from '../utils';
 
 export const TOKEN_STORAGE_KEY = "vssut_olx_token";
 

@@ -155,6 +155,7 @@ export const userService = {
       branch: payload.branch,
       year: payload.year ? Number(payload.year) : undefined,
       whatsappNumber: payload.whatsappNumber?.trim() || '',
+      phoneNumber: payload.phoneNumber?.trim() || '',
     };
     const { data } = await api.put('/users/profile', body);
     return normalizeUser(data.user);

@@ -1,10 +1,10 @@
 import { useForm } from 'react-hook-form';
-import SEO from '../components/SEO';
-import Button from '../components/Button';
-import Input from '../components/Input';
+import { SEO } from '../components';
+import { Button } from '../components';
+import { Input } from '../components';
 import { authService } from '../services';
-import { useNotificationStore } from '../store/notificationStore';
-import { emailValidation } from '../utils/validators';
+import { useNotificationStore } from '../store';
+import { emailValidation } from '../utils';
 
 export default function ForgotPassword() {
   const { register, handleSubmit, formState: { errors } } = useForm();
