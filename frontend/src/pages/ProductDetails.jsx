@@ -98,7 +98,16 @@ export default function ProductDetails() {
             <div className="mt-6 grid gap-3 sm:grid-cols-2">
               <Button onClick={handleWishlist}>{wished ? <FaHeart /> : <FaRegHeart />} {wished ? 'Wishlisted' : 'Wishlist'}</Button>
               {whatsappLink ? (
-                <Button as="a" href={whatsappLink} target="_blank" rel="noreferrer" variant="secondary"><FaWhatsapp /> Contact Seller</Button>
+                <Button
+                  as="a"
+                  href={whatsappLink}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="bg-[#25D366] hover:bg-[#20BD5A] text-white border-0"
+                >
+                  <FaWhatsapp />
+                  Contact Seller
+                </Button>
               ) : (
                 <p className="rounded-md bg-slate-50 px-3 py-2 text-sm font-semibold text-slate-500">Seller has not shared WhatsApp number.</p>
               )}
