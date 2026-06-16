@@ -45,9 +45,13 @@ function ProtectedRoute({ roles }) {
 
 function PublicLayout() {
   return (
-    <div className="min-h-screen bg-appbg">
+    <div className="flex min-h-screen flex-col bg-appbg">
       <Navbar />
-      <main><Outlet /></main>
+
+      <main className="flex-1">
+        <Outlet />
+      </main>
+
       <Footer />
     </div>
   );
@@ -66,51 +70,122 @@ function SectionLayout({ title, items }) {
 }
 
 function AppRoutes() {
+  const location = useLocation();
+  const state = location.state;
+
   return (
-    <Routes>
-      <Route element={<PublicLayout />}>
-        <Route index element={<Home />} />
-        <Route path="products" element={<Products />} />
-        <Route path="products/:id" element={<ProductDetails />} />
-        <Route path="search" element={<SearchResults />} />
-        <Route path="login" element={<Login />} />
-        <Route path="register" element={<Register />} />
-        <Route path="forgot-password" element={<ForgotPassword />} />
-        <Route path="sellers/:id" element={<SellerProfile />} />
-        <Route path="about" element={<About />} />
-        <Route path="contact" element={<Contact />} />
-        <Route path="privacy" element={<PrivacyPolicy />} />
-        <Route path="terms" element={<Terms />} />
-      </Route>
+    <>
+      <Routes location={state?.backgroundLocation || location}>
+        <Route element={<PublicLayout />}>
+          <Route index element={<Home />} />
 
-      <Route element={<ProtectedRoute />}>
-        <Route path="dashboard" element={<SectionLayout title="Dashboard" items={dashboardNav} />}>
-          <Route index element={<DashboardPage />} />
-          <Route path="listings" element={<MyListings />} />
-          <Route path="listings/new" element={<CreateListing />} />
-          <Route path="listings/:id/edit" element={<EditListing />} />
-          <Route path="wishlist" element={<Wishlist />} />
-          <Route path="settings" element={<ProfileSettings />} />
-          <Route path="notifications" element={<Notifications />} />
-          <Route path="logout" element={<Logout />} />
+          <Route path="products" element={<Products />} />
+          <Route path="products/:id" element={<ProductDetails />} />
+          <Route path="search" element={<SearchResults />} />
+
+          {/* Needed for redirects/direct URLs */}
+          <Route path="login" element={<Login />} />
+          <Route path="register" element={<Register />} />
+
+          <Route
+            path="forgot-password"
+            element={<ForgotPassword />}
+          />
+          <Route
+            path="sellers/:id"
+            element={<SellerProfile />}
+          />
+          <Route path="about" element={<About />} />
+          <Route path="contact" element={<Contact />} />
+          <Route
+            path="privacy"
+            element={<PrivacyPolicy />}
+          />
+          <Route path="terms" element={<Terms />} />
         </Route>
-      </Route>
 
-      <Route element={<ProtectedRoute roles={['admin']} />}>
-        <Route path="admin" element={<SectionLayout title="Admin" items={adminNav} />}>
-          <Route index element={<AdminDashboard />} />
-          <Route path="users" element={<ManageUsers />} />
-          <Route path="listings" element={<ManageListings />} />
-          <Route path="reports" element={<Reports />} />
-          <Route path="analytics" element={<Analytics />} />
+        <Route element={<ProtectedRoute />}>
+          <Route
+            path="dashboard"
+            element={
+              <SectionLayout
+                title="Dashboard"
+                items={dashboardNav}
+              />
+            }
+          >
+            <Route index element={<DashboardPage />} />
+            <Route path="listings" element={<MyListings />} />
+            <Route
+              path="listings/new"
+              element={<CreateListing />}
+            />
+            <Route
+              path="listings/:id/edit"
+              element={<EditListing />}
+            />
+            <Route path="wishlist" element={<Wishlist />} />
+            <Route
+              path="settings"
+              element={<ProfileSettings />}
+            />
+            <Route
+              path="notifications"
+              element={<Notifications />}
+            />
+            <Route path="logout" element={<Logout />} />
+          </Route>
         </Route>
-      </Route>
 
-      <Route path="/dashboard/profile" element={<Navigate to="/dashboard/settings" replace />} />
-      <Route path="*" element={<PublicLayout />}>
-        <Route path="*" element={<NotFound />} />
-      </Route>
-    </Routes>
+        <Route
+          element={<ProtectedRoute roles={['admin']} />}
+        >
+          <Route
+            path="admin"
+            element={
+              <SectionLayout
+                title="Admin"
+                items={adminNav}
+              />
+            }
+          >
+            <Route index element={<AdminDashboard />} />
+            <Route path="users" element={<ManageUsers />} />
+            <Route
+              path="listings"
+              element={<ManageListings />}
+            />
+            <Route path="reports" element={<Reports />} />
+            <Route
+              path="analytics"
+              element={<Analytics />}
+            />
+          </Route>
+        </Route>
+
+        <Route
+          path="/dashboard/profile"
+          element={
+            <Navigate
+              to="/dashboard/settings"
+              replace
+            />
+          }
+        />
+
+        <Route path="*" element={<PublicLayout />}>
+          <Route path="*" element={<NotFound />} />
+        </Route>
+      </Routes>
+
+      {/* Modal overlay routes */}
+      {state?.backgroundLocation && (
+        <Routes>
+          <Route path="/login" element={<Login />} />
+          <Route path="/register" element={<Register />} />
+        </Routes>
+      )}
+    </>
   );
 }
 

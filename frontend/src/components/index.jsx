@@ -1,6 +1,6 @@
 import { forwardRef, useEffect, useState } from 'react';
 import { Helmet } from 'react-helmet-async';
-import { Link, NavLink, useNavigate } from 'react-router-dom';
+import { Link, NavLink, useNavigate, useLocation } from 'react-router-dom';
 import {
   FaBars,
   FaBell,
@@ -12,13 +12,16 @@ import {
   FaStar,
   FaTimes,
   FaTrash,
+  FaGithub,
   FaUserCircle,
 } from 'react-icons/fa';
 import { useAuthStore, useNotificationStore, useWishlistStore } from '../store';
 import { formatCurrency, pageTitle, seoDefaults, timeAgo } from '../utils';
 
+
+
 const buttonVariants = {
-  primary: 'bg-primary text-white hover:bg-blue-700',
+  primary: 'bg-primary text-white hover:bg-[#e25f00]',
   secondary: 'bg-secondary text-white hover:bg-slate-900',
   outline: 'border border-slate-300 bg-white text-secondary hover:bg-slate-50',
   ghost: 'text-secondary hover:bg-slate-100',
@@ -31,11 +34,43 @@ const buttonSizes = {
   lg: 'h-12 px-5 text-base',
 };
 
-export function Button({ children, variant = 'primary', size = 'md', className = '', to, as, type = 'button', ...props }) {
+export function Button({
+  children,
+  variant = 'primary',
+  size = 'md',
+  className = '',
+  to,
+  as,
+  type = 'button',
+  state,
+  ...props
+}) {
   const classes = `inline-flex items-center justify-center gap-2 rounded-md font-semibold transition focus-ring disabled:cursor-not-allowed disabled:opacity-60 ${buttonVariants[variant]} ${buttonSizes[size]} ${className}`;
-  if (to) return <Link to={to} className={classes} {...props}>{children}</Link>;
-  if (as === 'a') return <a className={classes} {...props}>{children}</a>;
-  return <button type={type} className={classes} {...props}>{children}</button>;
+
+  if (to)
+    return (
+      <Link
+        to={to}
+        state={state}
+        className={classes}
+        {...props}
+      >
+        {children}
+      </Link>
+    );
+
+  if (as === 'a')
+    return (
+      <a className={classes} {...props}>
+        {children}
+      </a>
+    );
+
+  return (
+    <button type={type} className={classes} {...props}>
+      {children}
+    </button>
+  );
 }
 
 export function Avatar({ src, name = 'User', size = 'md' }) {
@@ -170,29 +205,47 @@ export function Modal({ open, title, children, onClose }) {
     </div>
   );
 }
-
 export function SearchBar({ compact = false, initialValue = '' }) {
   const [query, setQuery] = useState(initialValue);
   const navigate = useNavigate();
+
   const submit = (event) => {
     event.preventDefault();
     navigate(`/search?q=${encodeURIComponent(query.trim())}`);
   };
+
   return (
-    <form onSubmit={submit} className={`flex w-full items-center gap-2 rounded-md border border-slate-300 bg-white p-1.5 ${compact ? 'max-w-xl' : 'shadow-soft'}`}>
-      <FaSearch className="ml-3 shrink-0 text-slate-400" />
-      <input value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Search books, cycles, electronics..." className="h-10 min-w-0 flex-1 bg-transparent px-2 text-sm outline-none" />
-      <Button type="submit" size="sm">Search</Button>
+    <form
+      onSubmit={submit}
+      className="flex w-full items-center rounded-full bg-[#f3f4f8] px-5 py-3"
+    >
+
+      <input
+        value={query}
+        onChange={(event) => setQuery(event.target.value)}
+        placeholder="Search books, cycles, electronics..."
+        className="ml-4 flex-1 bg-transparent text-sm text-slate-700 outline-none placeholder:text-slate-400"
+      />
+
+      <button
+        type="submit"
+        className="text-slate-500 transition hover:text-primary"
+      >
+        <FaSearch size={18} />
+      </button>
     </form>
   );
 }
-
 export function ImageCarousel({ images = [] }) {
   const [active, setActive] = useState(0);
   return (
     <div>
-      <div className="aspect-[4/3] overflow-hidden rounded-md bg-slate-100">
-        <img src={images[active]} alt="Product" className="h-full w-full object-cover" />
+      <div className="h-[500px] rounded-md bg-slate-100">
+        <img
+          src={images[active]}
+          alt="Product"
+          className="w-full h-full object-contain"
+        />
       </div>
       {images.length > 1 && (
         <div className="mt-3 grid grid-cols-5 gap-2">
@@ -207,46 +260,142 @@ export function ImageCarousel({ images = [] }) {
   );
 }
 
+// export function ProductCard({ product }) {
+//   const ids = useWishlistStore((state) => state.ids);
+//   const toggle = useWishlistStore((state) => state.toggle);
+//   const user = useAuthStore((state) => state.user);
+//   const pushToast = useNotificationStore((state) => state.pushToast);
+//   const wished = ids.includes(product.id);
+//   const onToggle = async () => {
+//     if (!user) {
+//       pushToast({ message: 'Unauthorized. Please login.' });
+//       return;
+//     }
+//     try {
+//       const result = await toggle(product.id);
+//       pushToast({ message: result.added ? 'Added to wishlist' : 'Removed from wishlist' });
+//     } catch (error) {
+//       pushToast({ message: error.message });
+//     }
+//   };
+
+//   return (
+//     <article className="surface group overflow-hidden rounded-md transition hover:-translate-y-0.5 hover:shadow-soft">
+//       <Link to={`/products/${product.id}`} className="block aspect-[4/3] overflow-hidden bg-slate-100">
+//         <img src={product.images[0]} alt={product.title} className="h-full w-full object-cover transition duration-300 group-hover:scale-105" loading="lazy" />
+//       </Link>
+//       <div className="p-4">
+//         <div className="mb-3 flex items-start justify-between gap-3">
+//           <div>
+//             <Link to={`/products/${product.id}`} className="line-clamp-2 font-bold text-secondary hover:text-primary">{product.title}</Link>
+//             <p className="mt-1 text-lg font-extrabold text-primary">{formatCurrency(product.price)}</p>
+//           </div>
+//           <Button variant="ghost" size="sm" onClick={onToggle} aria-label="Toggle wishlist">
+//             {wished ? <FaHeart className="text-danger" /> : <FaRegHeart />}
+//           </Button>
+//         </div>
+//         <div className="flex flex-wrap items-center gap-2 text-xs text-slate-500">
+//           <Badge>{product.category}</Badge>
+//           <span>{product.seller?.name || 'VSSUT seller'}</span>
+//           <span>{timeAgo(product.postedAt)}</span>
+//         </div>
+//       </div>
+//     </article>
+//   );
+// }
+
 export function ProductCard({ product }) {
   const ids = useWishlistStore((state) => state.ids);
   const toggle = useWishlistStore((state) => state.toggle);
   const user = useAuthStore((state) => state.user);
   const pushToast = useNotificationStore((state) => state.pushToast);
+
   const wished = ids.includes(product.id);
-  const onToggle = async () => {
+
+  const onToggle = async (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+
     if (!user) {
       pushToast({ message: 'Unauthorized. Please login.' });
       return;
     }
+
     try {
       const result = await toggle(product.id);
-      pushToast({ message: result.added ? 'Added to wishlist' : 'Removed from wishlist' });
+
+      pushToast({
+        message: result.added
+          ? 'Added to wishlist'
+          : 'Removed from wishlist',
+      });
     } catch (error) {
       pushToast({ message: error.message });
     }
   };
 
   return (
-    <article className="surface group overflow-hidden rounded-md transition hover:-translate-y-0.5 hover:shadow-soft">
-      <Link to={`/products/${product.id}`} className="block aspect-[4/3] overflow-hidden bg-slate-100">
-        <img src={product.images[0]} alt={product.title} className="h-full w-full object-cover transition duration-300 group-hover:scale-105" loading="lazy" />
-      </Link>
-      <div className="p-4">
-        <div className="mb-3 flex items-start justify-between gap-3">
-          <div>
-            <Link to={`/products/${product.id}`} className="line-clamp-2 font-bold text-secondary hover:text-primary">{product.title}</Link>
-            <p className="mt-1 text-lg font-extrabold text-primary">{formatCurrency(product.price)}</p>
+    <article className="group">
+      <Link
+        to={`/products/${product.id}`}
+        className="block"
+      >
+        {/* Image */}
+        <div className="relative overflow-hidden rounded-3xl">
+          <div className="aspect-[4/3] overflow-hidden bg-slate-100">
+            <img
+              src={product.images[0]}
+              alt={product.title}
+              className="h-full w-full object-cover transition duration-300 group-hover:scale-105"
+              loading="lazy"
+            />
           </div>
-          <Button variant="ghost" size="sm" onClick={onToggle} aria-label="Toggle wishlist">
-            {wished ? <FaHeart className="text-danger" /> : <FaRegHeart />}
-          </Button>
+
+          {/* Gradient */}
+          <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
+
+          {/* Wishlist */}
+          <div className="absolute right-3 top-3">
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={onToggle}
+              aria-label="Toggle wishlist"
+              className="rounded-full bg-white/90 backdrop-blur"
+            >
+              {wished ? (
+                <FaHeart className="text-danger" />
+              ) : (
+                <FaRegHeart />
+              )}
+            </Button>
+          </div>
+
+          {/* Price */}
+          <div className="absolute bottom-3 left-3">
+            <p className="text-2xl font-extrabold text-white">
+              {formatCurrency(product.price)}
+            </p>
+          </div>
         </div>
-        <div className="flex flex-wrap items-center gap-2 text-xs text-slate-500">
-          <Badge>{product.category}</Badge>
-          <span>{product.seller?.name || 'VSSUT seller'}</span>
-          <span>{timeAgo(product.postedAt)}</span>
+
+        {/* Details */}
+        <div className="mt-4 px-1">
+          <h3 className="line-clamp-2 text-lg font-bold text-secondary group-hover:text-primary">
+            {product.title}
+          </h3>
+
+          <div className="mt-2 flex flex-wrap items-center gap-2 text-sm text-slate-500">
+            <Badge>{product.category}</Badge>
+            <span>•</span>
+            <span>{product.seller?.name || 'VSSUT Seller'}</span>
+          </div>
+
+          <p className="mt-1 text-sm text-slate-500">
+            {timeAgo(product.postedAt)}
+          </p>
         </div>
-      </div>
+      </Link>
     </article>
   );
 }
@@ -324,6 +473,7 @@ export function Navbar() {
   const user = useAuthStore((state) => state.user);
   const hydrate = useAuthStore((state) => state.hydrate);
   const unreadCount = useNotificationStore((state) => state.unreadCount);
+  const location = useLocation();
 
   useEffect(() => {
     hydrate();
@@ -331,31 +481,124 @@ export function Navbar() {
 
   return (
     <header className="sticky top-0 z-30 border-b border-slate-200 bg-white/95 backdrop-blur">
-      <div className="flex h-16 items-center gap-4 px-6 lg:px-10">
-        <Link to="/" className="shrink-0 text-xl font-extrabold text-primary">VSSUT OLX</Link>
-        <div className="hidden flex-1 justify-center lg:flex"><SearchBar compact /></div>
-        <div className="ml-auto hidden items-center gap-2 md:flex">
-          <Button to="/dashboard/listings/new" size="sm"><FaPlus /> SELL</Button>
+      <div className="flex h-20 items-center px-6 lg:px-10">
+
+        {/* Logo */}
+        <Link
+          to="/"
+          className="flex items-center gap-3 shrink-0"
+        >
+          <img
+            src="/images/logo.png"
+            alt="VSSUT OLX Logo"
+            className="h-11 w-11 object-contain"
+          />
+
+          <div className="leading-none">
+            <div className="text-xl font-extrabold text-primary">
+              VSSUT OLX
+            </div>
+            <div className="text-[10px] uppercase tracking-wider text-slate-500">
+              Campus Marketplace
+            </div>
+          </div>
+        </Link>
+
+        {/* Search */}
+        <div className="hidden flex-1 justify-center px-8 lg:flex">
+          <div className="w-full max-w-3xl">
+            <SearchBar compact />
+          </div>
+        </div>
+
+        {/* Desktop Actions */}
+        <div className="hidden shrink-0 items-center gap-3 md:flex">
+
+          <Button
+            to="/dashboard/listings/new"
+            size="sm"
+            className="rounded-xl"
+          >
+            <FaPlus />
+            SELL
+          </Button>
+
           {user ? (
             <>
-              <Button to="/dashboard/notifications" variant="ghost" size="sm" aria-label="Notifications"><FaBell />{unreadCount > 0 && <span className="text-xs text-danger">{unreadCount}</span>}</Button>
-              <Button to="/dashboard" variant="outline" size="sm"><FaUserCircle /> Profile</Button>
+              <Link
+                to="/dashboard/notifications"
+                className="relative flex h-11 w-11 items-center justify-center rounded-full text-secondary transition hover:bg-slate-100"
+              >
+                <FaBell size={18} />
+
+                {unreadCount > 0 && (
+                  <span className="absolute right-1 top-1 flex h-5 min-w-[20px] items-center justify-center rounded-full bg-danger px-1 text-[10px] text-white">
+                    {unreadCount}
+                  </span>
+                )}
+              </Link>
+
+              <Link
+                to="/dashboard"
+                className="flex h-12 w-12 items-center justify-center rounded-full bg-slate-700 text-white transition hover:bg-slate-800"
+              >
+                <FaUserCircle size={24} />
+              </Link>
             </>
           ) : (
             <>
-              <Button to="/login" variant="ghost" size="sm">Login</Button>
-              <Button to="/register" size="sm">Register</Button>
+              <Button
+                to="/login"
+                state={{ backgroundLocation: location }}
+                variant="ghost"
+                size="sm"
+                className="rounded-xl"
+              >
+                Login
+              </Button>
+
+              <Button
+                to="/register"
+                state={{ backgroundLocation: location }}
+                size="sm"
+                className="rounded-xl"
+              >
+                Register
+              </Button>
             </>
           )}
         </div>
-        <Button variant="ghost" size="sm" className="md:hidden" onClick={() => setOpen(true)} aria-label="Open menu"><FaBars /></Button>
+
+        {/* Mobile Menu Button */}
+        <Button
+          variant="ghost"
+          size="sm"
+          className="ml-auto md:hidden"
+          onClick={() => setOpen(true)}
+          aria-label="Open menu"
+        >
+          <FaBars />
+        </Button>
       </div>
+
       {open && (
         <Drawer open={open} onClose={() => setOpen(false)}>
           <div className="grid gap-4">
             <SearchBar compact />
-            <Button to="/dashboard/listings/new" onClick={() => setOpen(false)}><FaPlus /> SELL</Button>
-            {user ? <Button to="/dashboard">Profile</Button> : <Button to="/login">Login</Button>}
+
+            <Button
+              to="/dashboard/listings/new"
+              onClick={() => setOpen(false)}
+            >
+              <FaPlus />
+              SELL
+            </Button>
+
+            {user ? (
+              <Button to="/dashboard">Profile</Button>
+            ) : (
+              <Button to="/login">Login</Button>
+            )}
           </div>
         </Drawer>
       )}
@@ -363,31 +606,85 @@ export function Navbar() {
   );
 }
 
+
+
 export function Footer() {
   return (
-    <footer className="mt-16 border-t border-slate-200 bg-white">
+    <footer className="mt-16 bg-black text-white">
       <div className="container-page grid gap-8 py-10 md:grid-cols-4">
         <div className="md:col-span-2">
-          <Link to="/" className="text-xl font-extrabold text-primary">VSSUT OLX</Link>
-          <p className="mt-3 max-w-md text-sm text-slate-500">A trusted campus marketplace for VSSUT students to buy, sell, and exchange essentials with confidence.</p>
+          <Link
+            to="/"
+            className="text-xl font-extrabold text-primary"
+          >
+            VSSUT OLX
+          </Link>
+
+          <p className="mt-3 max-w-md text-sm text-slate-400">
+            A trusted campus marketplace for VSSUT students to buy,
+            sell, and exchange essentials with confidence.
+          </p>
+
+          <a
+            href="https://github.com/Purnabiswal"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="mt-4 inline-flex items-center text-slate-400 transition-all duration-200 hover:text-primary hover:scale-110"
+          >
+            <FaGithub size={28} />
+          </a>
         </div>
+
         <div>
-          <h4 className="font-bold text-secondary">Marketplace</h4>
-          <div className="mt-3 grid gap-2 text-sm text-slate-500">
-            <Link to="/">Home</Link>
-            <Link to="/products">Products</Link>
-            <Link to="/about">About</Link>
-            <Link to="/dashboard/listings/new">Sell item</Link>
-            <Link to="/contact">Contact</Link>
+          <h4 className="font-bold text-white">
+            Marketplace
+          </h4>
+
+          <div className="mt-3 grid gap-2 text-sm text-slate-400">
+            <Link to="/" className="hover:text-primary transition">
+              Home
+            </Link>
+
+            <Link to="/products" className="hover:text-primary transition">
+              Products
+            </Link>
+
+            <Link to="/about" className="hover:text-primary transition">
+              About
+            </Link>
+
+            <Link
+              to="/dashboard/listings/new"
+              className="hover:text-primary transition"
+            >
+              Sell Item
+            </Link>
+
+            <Link to="/contact" className="hover:text-primary transition">
+              Contact
+            </Link>
           </div>
         </div>
+
         <div>
-          <h4 className="font-bold text-secondary">Legal</h4>
-          <div className="mt-3 grid gap-2 text-sm text-slate-500">
-            <Link to="/privacy">Privacy Policy</Link>
-            <Link to="/terms">Terms & Conditions</Link>
+          <h4 className="font-bold text-white">
+            Legal
+          </h4>
+
+          <div className="mt-3 grid gap-2 text-sm text-slate-400">
+            <Link to="/privacy" className="hover:text-primary transition">
+              Privacy Policy
+            </Link>
+
+            <Link to="/terms" className="hover:text-primary transition">
+              Terms & Conditions
+            </Link>
           </div>
         </div>
+      </div>
+
+      <div className="border-t border-slate-800 py-4 text-center text-sm text-slate-500">
+        © {new Date().getFullYear()} VSSUT OLX. All rights reserved.
       </div>
     </footer>
   );
@@ -399,6 +696,43 @@ export function Toast() {
   return (
     <div className="fixed bottom-5 right-5 z-50 max-w-sm rounded-md bg-secondary px-4 py-3 text-sm font-semibold text-white shadow-soft">
       {toast.message}
+    </div>
+  );
+}
+
+
+export function AuthModal({ children, title }) {
+  const navigate = useNavigate();
+  const location = useLocation();
+
+  const closeModal = () => {
+    navigate(
+      location.state?.backgroundLocation?.pathname || "/",
+      { replace: true }
+    );
+  };
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center">
+      <div
+        className="absolute inset-0 bg-black/50 backdrop-blur-sm"
+        onClick={closeModal}
+      />
+
+      <div className="relative z-10 w-full max-w-md rounded-3xl bg-white p-8 shadow-2xl">
+        <button
+          onClick={closeModal}
+          className="absolute right-4 top-4 text-slate-500 transition hover:text-black"
+        >
+          <FaTimes />
+        </button>
+
+        <h1 className="mb-6 text-2xl font-bold text-secondary">
+          {title}
+        </h1>
+
+        {children}
+      </div>
     </div>
   );
 }

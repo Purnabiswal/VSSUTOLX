@@ -1,13 +1,16 @@
 import { useForm } from 'react-hook-form';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation, Link } from 'react-router-dom';
 import { SEO } from '../components';
 import { Button } from '../components';
 import { Input } from '../components';
 import { useAuthStore } from '../store';
 import { useNotificationStore } from '../store';
 import { emailValidation, required } from '../utils';
+import { AuthModal } from '../components';
+
 
 export default function Register() {
+  const location = useLocation();
   const { register, handleSubmit, formState: { errors } } = useForm();
   const registerUser = useAuthStore((state) => state.register);
   const loading = useAuthStore((state) => state.loading);
@@ -24,19 +27,64 @@ export default function Register() {
   };
 
   return (
-    <section className="container-page grid min-h-[70vh] place-items-center py-10">
+    <AuthModal title="Register">
       <SEO title="Register" />
-      <form onSubmit={handleSubmit(onSubmit)} className="surface w-full max-w-lg rounded-md p-6">
-        <h1 className="text-2xl font-extrabold text-secondary">Create Account</h1>
-        <div className="mt-6 grid gap-4 sm:grid-cols-2">
-          <Input label="Full name" {...register('name', required('Name'))} error={errors.name?.message} />
-          <Input label="Branch" {...register('branch', required('Branch'))} error={errors.branch?.message} />
-          <Input label="Year" type="number" min="1" max="5" {...register('year')} error={errors.year?.message} />
-          <Input label="Email" className="sm:col-span-2" {...register('email', emailValidation)} error={errors.email?.message} />
-          <Input label="Password" type="password" className="sm:col-span-2" {...register('password', required('Password'))} error={errors.password?.message} />
-          <Button type="submit" className="sm:col-span-2" disabled={loading}>{loading ? 'Creating account...' : 'Register'}</Button>
+      <form onSubmit={handleSubmit(onSubmit)}>
+
+        <div className="mt-6 flex flex-col gap-4">
+          <Input
+            label="Full name"
+            {...register('name', required('Name'))}
+            error={errors.name?.message}
+          />
+
+          <Input
+            label="Branch"
+            {...register('branch', required('Branch'))}
+            error={errors.branch?.message}
+          />
+
+          <Input
+            label="Year"
+            type="number"
+            min="1"
+            max="5"
+            {...register('year')}
+            error={errors.year?.message}
+          />
+
+          <Input
+            label="Email"
+            {...register('email', emailValidation)}
+            error={errors.email?.message}
+          />
+
+          <Input
+            label="Password"
+            type="password"
+            {...register('password', required('Password'))}
+            error={errors.password?.message}
+          />
+
+          <Button type="submit" disabled={loading}>
+            {loading ? 'Creating account...' : 'Register'}
+          </Button>
+          <div className="mt-4 text-center text-sm text-slate-500">
+            Already have an account?{" "}
+            <Link
+              to="/login"
+              replace
+              className="text-primary"
+              state={{
+                backgroundLocation:
+                  location.state?.backgroundLocation || location
+              }}
+            >
+              Login
+            </Link>
+          </div>
         </div>
       </form>
-    </section>
+    </AuthModal>
   );
 }

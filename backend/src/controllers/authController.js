@@ -78,7 +78,7 @@ export const forgotPassword = asyncHandler(async (req, res) => {
     await user.save({ validateBeforeSave: false });
     console.log(`Password reset token for ${user.email}: ${token}`);
   }
-  res.status(200).json({ success: true, message: 'If the email exists, a reset link has been generated.' });
+  res.status(200).json({ success: true, message: 'If the email exists, a reset link has been sent.' });
 });
 
 export const resetPassword = asyncHandler(async (req, res) => {
