@@ -87,35 +87,88 @@ export default function ProductDetails() {
       <SEO title={currentProduct.title} description={currentProduct.description} image={currentProduct.images[0]} />
       <Breadcrumb items={[{ label: 'Home', to: '/' }, { label: 'Products', to: '/products' }, { label: currentProduct.title }]} />
       <div className="grid gap-8 lg:grid-cols-[1fr_380px]">
-        <div><ImageCarousel images={currentProduct.images} /></div>
-        <aside className="space-y-5">
-          <div className="surface rounded-md p-5">
-            <p className="text-sm font-semibold uppercase text-primary">{currentProduct.category}</p>
-            <h1 className="mt-2 text-3xl font-extrabold text-secondary">{currentProduct.title}</h1>
-            <p className="mt-2 text-3xl font-extrabold text-primary">{formatCurrency(currentProduct.price)}</p>
-            <p className="mt-4 text-sm text-slate-500">{currentProduct.location} · Posted {formatDate(currentProduct.postedAt)} · {currentProduct.status}</p>
-            <p className="mt-5 text-slate-600">{currentProduct.description}</p>
-            <div className="mt-6 grid gap-3 sm:grid-cols-2">
-              <Button onClick={handleWishlist}>{wished ? <FaHeart /> : <FaRegHeart />} {wished ? 'Wishlisted' : 'Wishlist'}</Button>
-              {whatsappLink ? (
-                <Button
-                  as="a"
-                  href={whatsappLink}
-                  target="_blank"
-                  rel="noreferrer"
-                  className="bg-[#25D366] hover:bg-[#20BD5A] text-white border-0"
-                >
-                  <FaWhatsapp />
-                  Contact Seller
-                </Button>
-              ) : (
-                <p className="rounded-md bg-slate-50 px-3 py-2 text-sm font-semibold text-slate-500">Seller has not shared WhatsApp number.</p>
-              )}
-              <Button onClick={handleShare} variant="outline"><FaShareAlt /> Share</Button>
-              <Button onClick={() => (requireAuth() ? setReportOpen(true) : undefined)} variant="outline"><FaFlag /> Report</Button>
+        <div>
+          <ImageCarousel images={currentProduct.images} />
+        </div>
+
+        <aside className="space-y-6">
+          <div className="rounded-3xl bg-white p-6 shadow-sm border border-slate-100">
+            <p className="text-sm font-semibold uppercase tracking-wide text-slate-500">
+              {currentProduct.category}
+            </p>
+
+            <h1 className="mt-2 text-3xl font-extrabold text-secondary">
+              {currentProduct.title}
+            </h1>
+
+            <p className="mt-3 text-4xl font-extrabold text-secondary">
+              ₹{currentProduct.price}
+            </p>
+
+            <p className="mt-4 text-sm text-slate-500">
+              {currentProduct.location} · Posted{" "}
+              {formatDate(currentProduct.postedAt)} · {currentProduct.status}
+            </p>
+
+            <p className="mt-5 leading-relaxed text-slate-600">
+              {currentProduct.description}
+            </p>
+
+            <div className="mt-6 grid grid-cols-2 gap-3">
+              <Button
+                onClick={handleWishlist}
+                variant="ghost"
+                className="h-14 rounded-2xl bg-slate-100 hover:bg-slate-200"
+              >
+                {wished ? <FaHeart /> : <FaRegHeart />}
+                {wished ? "Wishlisted" : "Wishlist"}
+              </Button>
+
+              <Button
+                onClick={handleShare}
+                variant="ghost"
+                className="h-14 rounded-2xl bg-slate-100 hover:bg-slate-200"
+              >
+                <FaShareAlt />
+                Share
+              </Button>
             </div>
+
+            {whatsappLink ? (
+              <Button
+                as="a"
+                href={whatsappLink}
+                target="_blank"
+                rel="noreferrer"
+                variant="whatsapp"
+                className="mt-4 h-14 w-full rounded-2xl text-base font-bold"
+              >
+                <FaWhatsapp />
+                Contact Seller
+              </Button>
+            ) : (
+              <p className="mt-4 rounded-2xl bg-slate-100 px-4 py-4 text-center text-sm font-medium text-slate-500">
+                Seller has not shared WhatsApp number.
+              </p>
+            )}
+
+            <Button
+              onClick={() =>
+                requireAuth() ? setReportOpen(true) : undefined
+              }
+              variant="ghost"
+              className="mt-4 h-12 w-full rounded-2xl bg-slate-100 text-slate-600 hover:bg-slate-200"
+            >
+              <FaFlag />
+              Report Listing
+            </Button>
           </div>
-          <ProfileCard user={currentProduct.seller} action="Seller Profile" />
+
+            <ProfileCard
+              user={currentProduct.seller}
+              action="View Profile"
+            />
+          
         </aside>
       </div>
       <div className="mt-12">

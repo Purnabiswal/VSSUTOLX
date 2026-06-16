@@ -26,6 +26,8 @@ const buttonVariants = {
   outline: 'border border-slate-300 bg-white text-secondary hover:bg-slate-50',
   ghost: 'text-secondary hover:bg-slate-100',
   danger: 'bg-danger text-white hover:bg-red-700',
+  whatsapp:
+    'bg-[#25D366] text-white hover:bg-[#20BD5A]',
 };
 
 const buttonSizes = {
@@ -74,11 +76,25 @@ export function Button({
 }
 
 export function Avatar({ src, name = 'User', size = 'md' }) {
-  const sizes = { sm: 'h-8 w-8 text-xs', md: 'h-10 w-10 text-sm', lg: 'h-16 w-16 text-lg' };
+  const sizes = {
+    sm: 'h-8 w-8 text-xs',
+    md: 'h-10 w-10 text-sm',
+    lg: 'h-14 w-14 text-lg',
+  };
+
   return src ? (
-    <img src={src} alt={name} className={`${sizes[size]} rounded-full object-cover`} loading="lazy" />
+    <img
+      src={src}
+      alt={name}
+      className={`${sizes[size]} rounded-full object-cover`}
+      loading="lazy"
+    />
   ) : (
-    <div className={`${sizes[size]} grid place-items-center rounded-full bg-primary text-white font-bold`}>{name.charAt(0)}</div>
+    <div
+      className={`${sizes[size]} grid place-items-center rounded-full bg-green-100 text-green-700 font-bold`}
+    >
+      {name.charAt(0).toUpperCase()}
+    </div>
   );
 }
 
@@ -414,18 +430,39 @@ export function WishlistCard({ product }) {
 
 export function ProfileCard({ user, action = 'View Profile' }) {
   return (
-    <div className="surface rounded-md p-5">
-      <div className="flex items-center gap-4">
-        <Avatar src={user.avatar} name={user.name} size="lg" />
-        <div>
-          <h3 className="font-bold text-secondary">{user.name}</h3>
-          <p className="text-sm text-slate-500">{user.branch || 'VSSUT'}{user.year ? ` · Year ${user.year}` : ''}</p>
-          <p className="mt-1 flex items-center gap-1 text-sm font-semibold text-amber-600"><FaStar /> {user.rating || 'New'}</p>
-          {user.whatsappNumber && <p className="mt-2 text-sm text-slate-500">WhatsApp: {user.whatsappNumber}</p>}
-          {user.phoneNumber && <p className="text-sm text-slate-500">Phone: {user.phoneNumber}</p>}
+    <div className="rounded-3xl bg-white p-4 shadow-sm border border-slate-100">
+      <div className="flex items-center gap-3">
+        <Avatar
+          src={user.avatar}
+          name={user.name}
+          size="lg"
+        />
+
+        <div className="flex-1 min-w-0">
+          <h3 className="truncate text-base font-bold text-secondary">
+            {user.name}
+          </h3>
+
+          <p className="text-sm text-slate-500">
+            {user.branch || 'VSSUT'}
+            {user.year ? ` · Year ${user.year}` : ''}
+          </p>
+
+          {user.phoneNumber && (
+            <p className="mt-1 text-sm text-slate-500">
+              Phone: {user.phoneNumber}
+            </p>
+          )}
         </div>
       </div>
-      <Button to={`/sellers/${user.id}`} className="mt-4 w-full" variant="outline">{action}</Button>
+
+      <Button
+        to={`/sellers/${user.id}`}
+        variant="outline"
+        className="mt-4 w-full rounded-2xl border-0 bg-slate-100 text-[#009E60] hover:bg-slate-200"
+      >
+        {action}
+      </Button>
     </div>
   );
 }
